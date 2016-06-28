@@ -19,6 +19,16 @@ var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
 // Global variable for storing valid expression
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
+// Validates path and extrates page title:
+func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
+	m := validPath.FindStringSubmatch(r.URL.Path)
+	if m == nil {
+		http.Notfound(w, r)
+		return "", errors.New("Invalid page title")
+	}
+	return m[2], nil // title is the second expression
+}
+
 func (p *Page) save() error {
 	filename := p.Title + ".txt"
 	return ioutil.WriteFile(filename, p.Body, 0600)
